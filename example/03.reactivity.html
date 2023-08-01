@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <h1 id="app">
+    </h1>
+    <script src="../packages/reactivity/dist/reactivity.global.js"></script>
+    <script>
+        // eslint-disable-next-line no-undef
+        const { effect, reactive } = VueReactivity
+        // 分支切换
+        const changeState = reactive({
+          flag: false,
+          name: 'mz',
+          age: '18',
+        })
+        effect(() => {
+          console.log('effect')
+          document.querySelector('#app').innerHTML = `${changeState.flag ? changeState.name : changeState.age}`
+        })
+        setTimeout(() => {
+          changeState.flag = true
+        }, 2000)
+        setTimeout(() => {
+          changeState.age = '12121'
+          console.log('修改 age 不会触发 effect')
+        }, 2000)
+    </script>
+</body>
+
+</html>
