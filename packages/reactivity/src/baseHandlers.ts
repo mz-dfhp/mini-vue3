@@ -1,7 +1,7 @@
-import { hasChanged } from '@vue/shared'
+import { hasChanged, isObject } from '@vue/shared'
 import { track, trigger } from './effect'
 import { TrackOpTypes, TriggerOpTypes } from './operations'
-import { ReactiveFlags, type Target } from './reactive'
+import { ReactiveFlags, type Target, reactive } from './reactive'
 
 const get = createGetter()
 const set = createSetter()
@@ -24,6 +24,10 @@ function createGetter() {
     }
     const res = Reflect.get(target, key, receiver)
     track(target, TrackOpTypes.GET, key)
+    // 取值时递归代理
+    if (isObject(res)) {
+      return reactive(res)
+    }
     return res
   }
 }
