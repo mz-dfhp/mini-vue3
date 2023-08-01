@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <h1 id="user"></h1>
+        <h2 id="name"></h2>
+        <h2 id="age"></h2>
+        <h2 id="sex"></h2>
+        <h2 id="change"></h2>
+    </div>
+    <script src="../packages/reactivity/dist/reactivity.global.js"></script>
+    <script>
+        // eslint-disable-next-line no-undef
+        const { effect, reactive } = VueReactivity
+        // const userState = reactive({
+        //     name: 'mz',
+        //     age: 18,
+        //     sex: 1,
+        // })
+        // effect(() => {
+        //     document.querySelector(
+        //         '#user',
+        //     ).innerHTML = `${userState.name} ${userState.age} ${userState.sex}`
+        // })
+        // setTimeout(() => {
+        //     userState.age = 19
+        //     userState.sex = 0
+        // }, 2000)
+
+        // 分支切换
+        const changeState = reactive({
+          flag: false,
+          name: 'mz',
+          age: '18',
+        })
+        effect(() => {
+          console.log('effect')
+          document.querySelector('#change').innerHTML = `${changeState.flag ? changeState.name : changeState.age}`
+        })
+        setTimeout(() => {
+          changeState.flag = true
+        }, 2000)
+    </script>
+</body>
+
+</html>
