@@ -1,10 +1,12 @@
 import { hasChanged, isObject } from '@vue/shared'
 import { track, trigger } from './effect'
 import { TrackOpTypes, TriggerOpTypes } from './operations'
-import { ReactiveFlags, type Target, reactive } from './reactive'
+import { ReactiveFlags, type Target, reactive, readonly } from './reactive'
 
 const get = createGetter()
 const set = createSetter()
+
+const readonlyGet = createGetter(true)
 
 // 为什么用 Reflect
 // 当 获取age 时要收集name name变化了 age也要重新计算
@@ -16,17 +18,22 @@ const set = createSetter()
 //   }
 // }
 
-function createGetter() {
+function createGetter(isReadonly = false) {
   return function (target: Target, key: string | symbol, receiver: object) {
     // 这几个 判断 都是控制 已经被代理了 直接返回 true 就在 createReactiveObject 就直接返回 target 了
     if (key === ReactiveFlags.IS_REACTIVE) {
       return true
     }
+    if (key === ReactiveFlags.IS_READONLY) {
+      return true
+    }
     const res = Reflect.get(target, key, receiver)
-    track(target, TrackOpTypes.GET, key)
+    if (!isReadonly) {
+      track(target, TrackOpTypes.GET, key)
+    }
     // 取值时递归代理
     if (isObject(res)) {
-      return reactive(res)
+      return isReadonly ? readonly(res) : reactive(res)
     }
     return res
   }
@@ -48,4 +55,12 @@ function createSetter() {
 export const mutableHandlers: ProxyHandler<object> = {
   get,
   set,
+}
+
+export const readonlyHandlers: ProxyHandler<object> = {
+  get: readonlyGet,
+  set(target, key) {
+    console.warn(`设置${String(key)}失败`, target, '是只读对象')
+    return true
+  },
 }
