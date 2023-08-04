@@ -71,3 +71,39 @@ function createReactiveObject(
   proxyMap.set(target, proxy)
   return proxy
 }
+
+/**
+ * @description 是否是由 reactive() 或 shallowReactive() 创建的代理。
+ * @param value
+ * @returns boolean
+ */
+export function isReactive(value: unknown): boolean {
+  return !!(value && (value as Target)[ReactiveFlags.IS_REACTIVE])
+}
+
+/**
+ * @description 是否为只读对象 通过 readonly() 和 shallowReadonly() 创建的代理
+ * @param value
+ * @returns boolean
+ */
+export function isReadonly(value: unknown): boolean {
+  return !!(value && (value as Target)[ReactiveFlags.IS_REACTIVE])
+}
+
+/**
+ * @description 是否是由 shallowReactive() 或 shallowReadonly() 创建的代理。
+ * @param value
+ * @returns boolean
+ */
+export function isShallow(value: unknown): boolean {
+  return !!(value && (value as Target)[ReactiveFlags.IS_SHALLOW])
+}
+
+/**
+ * @description 是否是由 reactive()、readonly()、shallowReactive() 或 shallowReadonly() 创建的代理。
+ * @param value
+ * @returns boolean
+ */
+export function isProxy(value: unknown): boolean {
+  return isReactive(value) || isReadonly(value)
+}
