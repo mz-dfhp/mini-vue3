@@ -1,5 +1,5 @@
 import { isObject } from '@vue/shared'
-import { mutableHandlers, readonlyHandlers, shallowReactiveHandlers } from './baseHandlers'
+import { mutableHandlers, readonlyHandlers, shallowReactiveHandlers, shallowReadonlyHandlers } from './baseHandlers'
 
 export enum ReactiveFlags {
   IS_REACTIVE = '__v_isReactive',
@@ -29,6 +29,10 @@ export function shallowReactive<T extends object>(target: T) {
 
 export function readonly<T extends object>(target: T) {
   return createReactiveObject(target, true, readonlyHandlers, {}, readonlyMap)
+}
+
+export function shallowReadonly<T extends object>(target: T) {
+  return createReactiveObject(target, true, shallowReadonlyHandlers, {}, shallowReadonlyMap)
 }
 
 /**

@@ -10,6 +10,7 @@ const shallowGet = createGetter(false, true)
 const shallowSet = createSetter(true)
 
 const readonlyGet = createGetter(true)
+const shallowReadonlyGet = createGetter(true, true)
 
 // 为什么用 Reflect
 // 当 获取age 时要收集name name变化了 age也要重新计算
@@ -75,6 +76,14 @@ export const shallowReactiveHandlers: ProxyHandler<object> = {
 
 export const readonlyHandlers: ProxyHandler<object> = {
   get: readonlyGet,
+  set(target, key) {
+    console.warn(`设置${String(key)}失败`, target, '是只读对象')
+    return true
+  },
+}
+
+export const shallowReadonlyHandlers: ProxyHandler<object> = {
+  get: shallowReadonlyGet,
   set(target, key) {
     console.warn(`设置${String(key)}失败`, target, '是只读对象')
     return true
