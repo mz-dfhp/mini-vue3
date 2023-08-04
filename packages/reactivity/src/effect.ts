@@ -28,11 +28,11 @@ export class ReactiveEffect<T = any> {
     // 收集sex 时 activeEffect指向第一层
 
     // effect(() => {    e1
-    //   state.name      name => e1
+    //   state        activeEffect => e1
     //   effect(() => {  e2
-    //     state.age     age => e2
+    //     state      activeEffect => e2
     //   })
-    //   state.sex       sex => e1
+    //   state        activeEffect => e1
     // })
 
     // 防止无限递归
