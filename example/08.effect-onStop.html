@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <h1 id="app">
+  </h1>
+  <script src="../packages/reactivity/dist/reactivity.global.js"></script>
+  <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+  <script>
+    // eslint-disable-next-line no-undef
+    const { effect, reactive } = VueReactivity
+
+    // const { effect, reactive } = Vue
+    const userState = reactive({
+      name: 'mz',
+      age: 18,
+      sex: 1,
+      address: {
+        city: 'city',
+      },
+    })
+    const runner = effect(() => {
+      document.querySelector(
+        '#app',
+      ).innerHTML = `${userState.name} ${userState.age} ${userState.sex} ${userState.address.city}`
+    }, {
+      onStop: () => {
+        console.log('effect stop 我会被调用')
+      },
+    })
+    runner.effect.stop()
+
+    setTimeout(() => {
+      userState.address.city = 'city-reactive'
+      userState.name = 'reactive'
+    }, 2000)
+  </script>
+</body>
+
+</html>

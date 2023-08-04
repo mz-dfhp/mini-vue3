@@ -20,7 +20,13 @@ export class ReactiveEffect<T = any> {
   active = true // 默认激活状态
   parent: ReactiveEffect | undefined = undefined
   deps: Dep[] = []
-  constructor(public fn: () => T) {}
+  private deferStop?: boolean // 防止执行过程中停止（stop）当前的响应式效果
+  onStop?: () => void
+  constructor(
+    public fn: () => T,
+    public scheduler: EffectScheduler | null = null,
+  ) { }
+
   run() {
     // 当组件多层级嵌套时 不会出现问题
     // vue2 使用的栈结构来处理的 前进后出
@@ -55,13 +61,24 @@ export class ReactiveEffect<T = any> {
     finally {
       activeEffect = this.parent
       this.parent = undefined
+      if (this.deferStop) {
+        this.stop()
+      }
     }
   }
 
   // 停止响应
   stop() {
-    cleanupEffect(this)
-    this.active = false
+    if (activeEffect === this) {
+      this.deferStop = true
+    }
+    else if (this.active) {
+      cleanupEffect(this)
+      if (this.onStop) {
+        this.onStop()
+      }
+      this.active = false
+    }
   }
 }
 
@@ -83,6 +100,7 @@ function cleanupEffect(effect: ReactiveEffect) {
 
 export interface ReactiveEffectOptions {
   onStop?: () => void
+  scheduler?: EffectScheduler
 }
 
 export interface ReactiveEffectRunner<T = any> {
@@ -96,9 +114,9 @@ export function effect(fn: () => void, options?: ReactiveEffectOptions): Reactiv
   if (options) {
     extend(_effect, options)
   }
-  if (!options) {
-    _effect.run()
-  }
+
+  _effect.run()
+
   const runner = _effect.run.bind(_effect) as ReactiveEffectRunner
   runner.effect = _effect
   return runner
