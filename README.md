@@ -5,8 +5,8 @@
 
 #### reativity
 
-- [X] effect
-- [X] stop
+- [X] effect 
+- [X] effect stop onStop scheduler
 - [X] reactive
 - [X] readonly
 - [X] shallowReactive

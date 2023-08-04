@@ -190,6 +190,9 @@ function triggerEffect(effect: ReactiveEffect) {
   // effect(() => {
   //   state.age = Math.random()
   // })
+  if (effect.scheduler) {
+    effect.scheduler()
+  }
   if (effect !== activeEffect) {
     effect.run()
   }
