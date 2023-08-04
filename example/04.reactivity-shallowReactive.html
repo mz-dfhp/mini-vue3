@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <h1 id="app">
+  </h1>
+  <script src="../packages/reactivity/dist/reactivity.global.js"></script>
+  <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+  <script>
+    // eslint-disable-next-line no-undef
+    const { effect, shallowReactive } = VueReactivity
+    const userState = shallowReactive({
+      name: 'mz',
+      age: 18,
+      sex: 1,
+      address: {
+        city: 'city',
+      },
+    })
+    effect(() => {
+      document.querySelector(
+        '#app',
+      ).innerHTML = `${userState.name} ${userState.age} ${userState.sex} ${userState.address.city}`
+    })
+    setTimeout(() => {
+      userState.address.city = 'city-shallowReactive'
+      userState.name = 'shallowReactive'
+    }, 2000)
+  </script>
+</body>
+
+</html>

@@ -1,14 +1,16 @@
 import { isObject } from '@vue/shared'
-import { mutableHandlers, readonlyHandlers } from './baseHandlers'
+import { mutableHandlers, readonlyHandlers, shallowReactiveHandlers } from './baseHandlers'
 
 export enum ReactiveFlags {
   IS_REACTIVE = '__v_isReactive',
   IS_READONLY = '__v_isReadonly',
+  IS_SHALLOW = '__v_isShallow',
 }
 
 export interface Target {
   [ReactiveFlags.IS_REACTIVE]?: boolean
   [ReactiveFlags.IS_READONLY]?: boolean
+  [ReactiveFlags.IS_SHALLOW]?: boolean
 }
 
 // 存储 key => 目标对象 value => 被代理目标对象
@@ -19,6 +21,10 @@ export const shallowReadonlyMap = new WeakMap<Target, any>()
 
 export function reactive<T extends object>(target: T) {
   return createReactiveObject(target, false, mutableHandlers, {}, reactiveMap)
+}
+
+export function shallowReactive<T extends object>(target: T) {
+  return createReactiveObject(target, false, shallowReactiveHandlers, {}, shallowReactiveMap)
 }
 
 export function readonly<T extends object>(target: T) {

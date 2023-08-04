@@ -6,6 +6,9 @@ import { ReactiveFlags, type Target, reactive, readonly } from './reactive'
 const get = createGetter()
 const set = createSetter()
 
+const shallowGet = createGetter(false, true)
+const shallowSet = createSetter(true)
+
 const readonlyGet = createGetter(true)
 
 // 为什么用 Reflect
@@ -18,7 +21,7 @@ const readonlyGet = createGetter(true)
 //   }
 // }
 
-function createGetter(isReadonly = false) {
+function createGetter(isReadonly = false, shallow = false) {
   return function (target: Target, key: string | symbol, receiver: object) {
     // 这几个 判断 都是控制 已经被代理了 直接返回 true 就在 createReactiveObject 就直接返回 target 了
     if (key === ReactiveFlags.IS_REACTIVE) {
@@ -27,9 +30,17 @@ function createGetter(isReadonly = false) {
     if (key === ReactiveFlags.IS_READONLY) {
       return true
     }
+    if (key === ReactiveFlags.IS_SHALLOW) {
+      return true
+    }
     const res = Reflect.get(target, key, receiver)
+
     if (!isReadonly) {
       track(target, TrackOpTypes.GET, key)
+    }
+    // 浅层代理 直接返回 只代理第一层
+    if (shallow) {
+      return res
     }
     // 取值时递归代理
     if (isObject(res)) {
@@ -38,7 +49,7 @@ function createGetter(isReadonly = false) {
     return res
   }
 }
-function createSetter() {
+function createSetter(shallow = false) {
   return function (target: Target, key: string | symbol, value: unknown, receiver: object) {
     const oldValue = (target as any)[key]
     // boolean
@@ -55,6 +66,11 @@ function createSetter() {
 export const mutableHandlers: ProxyHandler<object> = {
   get,
   set,
+}
+
+export const shallowReactiveHandlers: ProxyHandler<object> = {
+  get: shallowGet,
+  set: shallowSet,
 }
 
 export const readonlyHandlers: ProxyHandler<object> = {
