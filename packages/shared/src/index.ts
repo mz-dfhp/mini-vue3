@@ -10,3 +10,5 @@ export function isObject(val: unknown): val is Record<any, any> {
 export function hasChanged(value: any, oldValue: any): boolean {
   return !Object.is(value, oldValue)
 }
+
+export const extend = Object.assign

@@ -1,9 +1,11 @@
+import { extend } from '@vue/shared'
 import { type Dep, createDep } from './dep'
 import type { TrackOpTypes, TriggerOpTypes } from './operations'
-
 import { type Target } from './reactive'
 
+export type EffectScheduler = (...args: any[]) => any
 type KeyToDepMap = Map<any, Dep>
+
 const targetMap = new WeakMap<any, KeyToDepMap>()
 
 // eslint-disable-next-line import/no-mutable-exports
@@ -55,6 +57,12 @@ export class ReactiveEffect<T = any> {
       this.parent = undefined
     }
   }
+
+  // 停止响应
+  stop() {
+    cleanupEffect(this)
+    this.active = false
+  }
 }
 
 /**
@@ -73,9 +81,27 @@ function cleanupEffect(effect: ReactiveEffect) {
   }
 }
 
-export function effect(fn: () => void) {
+export interface ReactiveEffectOptions {
+  onStop?: () => void
+}
+
+export interface ReactiveEffectRunner<T = any> {
+  (): T
+  effect: ReactiveEffect
+}
+
+export function effect(fn: () => void, options?: ReactiveEffectOptions): ReactiveEffectRunner {
   const _effect = new ReactiveEffect(fn)
-  _effect.run()
+
+  if (options) {
+    extend(_effect, options)
+  }
+  if (!options) {
+    _effect.run()
+  }
+  const runner = _effect.run.bind(_effect) as ReactiveEffectRunner
+  runner.effect = _effect
+  return runner
 }
 
 /**
