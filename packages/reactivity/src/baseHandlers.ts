@@ -1,7 +1,7 @@
 import { hasChanged, isObject } from '@vue/shared'
 import { track, trigger } from './effect'
 import { TrackOpTypes, TriggerOpTypes } from './operations'
-import { ReactiveFlags, type Target, reactive, readonly } from './reactive'
+import { ReactiveFlags, type Target, reactive, reactiveMap, readonly, readonlyMap, shallowReactiveMap, shallowReadonlyMap } from './reactive'
 
 const get = createGetter()
 const set = createSetter()
@@ -33,6 +33,19 @@ function createGetter(isReadonly = false, shallow = false) {
     }
     if (key === ReactiveFlags.IS_SHALLOW) {
       return true
+    }
+    // 如果是 toRaw 返回其原始对象
+    if (key === ReactiveFlags.IS_REACTIVE) {
+      const targetMap = isReadonly
+        ? shallow
+          ? shallowReadonlyMap
+          : readonlyMap
+        : shallow
+          ? shallowReactiveMap
+          : reactiveMap
+      if (receiver === targetMap.get(target)) {
+        return target
+      }
     }
     const res = Reflect.get(target, key, receiver)
 

@@ -5,12 +5,14 @@ export enum ReactiveFlags {
   IS_REACTIVE = '__v_isReactive',
   IS_READONLY = '__v_isReadonly',
   IS_SHALLOW = '__v_isShallow',
+  RAW = '__v_raw',
 }
 
 export interface Target {
   [ReactiveFlags.IS_REACTIVE]?: boolean
   [ReactiveFlags.IS_READONLY]?: boolean
   [ReactiveFlags.IS_SHALLOW]?: boolean
+  [ReactiveFlags.RAW]?: any
 }
 
 // 存储 key => 目标对象 value => 被代理目标对象
@@ -54,8 +56,9 @@ function createReactiveObject(
   if (!isObject(target)) {
     console.warn('目标代理必须是对象')
   }
-  // 目标已经被代理过了 不需要多次代理 target在取值的时候会走 get [ReactiveFlags.IS_REACTIVE] return true
-  if (target[ReactiveFlags.IS_REACTIVE]) {
+  // 目标已经被代理过了 并且不是 readonly 不需要多次代理 target在取值的时候会走 get [ReactiveFlags.IS_REACTIVE] return true
+  if (target[ReactiveFlags.RAW]
+    && !(isReadonly && target[ReactiveFlags.IS_REACTIVE])) {
     return target
   }
 
@@ -74,10 +77,23 @@ function createReactiveObject(
 
 /**
  * @description 是否是由 reactive() 或 shallowReactive() 创建的代理。
+ * @example
+ * ```js
+ * isReactive(reactive({}))            // => true
+ * isReactive(readonly(reactive({})))  // => true
+ * isReactive(ref({}).value)           // => true
+ * isReactive(readonly(ref({})).value) // => true
+ * isReactive(ref(true))               // => false
+ * isReactive(shallowRef({}).value)    // => false
+ * isReactive(shallowReactive({}))     // => true
+ * ```
  * @param value
  * @returns boolean
  */
 export function isReactive(value: unknown): boolean {
+  if (isReadonly(value)) {
+    return isReactive((value as Target)[ReactiveFlags.RAW])
+  }
   return !!(value && (value as Target)[ReactiveFlags.IS_REACTIVE])
 }
 
@@ -106,4 +122,24 @@ export function isShallow(value: unknown): boolean {
  */
 export function isProxy(value: unknown): boolean {
   return isReactive(value) || isReadonly(value)
+}
+
+/**
+ * @description 根据一个 Vue 创建的代理返回其原始对象。
+ * @param observed
+ * @returns value
+ */
+export function toRaw<T>(observed: T): T {
+  const raw = observed && (observed as Target)[ReactiveFlags.RAW]
+  return raw ? toRaw(raw) : observed
+}
+
+/**
+ * @description 将普通值转换为响应式值的函数
+ * @param value
+ * @returns reactive value
+ */
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
+export function toReactive<T extends unknown>(value: T): T {
+  return isObject(value) ? reactive(value) : value
 }
