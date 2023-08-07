@@ -12,3 +12,4 @@
 - [X] shallowReactive
 - [X] shallowReadonly
 - [X] isReactive isReadonly isShallow isProxy
+- [X] toRaw toReactive
