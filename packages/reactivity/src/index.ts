@@ -3,4 +3,4 @@ export {
   reactive, readonly, shallowReactive, shallowReadonly,
   isReactive, isReadonly, isShallow, isProxy,
 } from './reactive'
-export { ref } from './ref'
+export { ref, shallowRef } from './ref'

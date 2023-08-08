@@ -178,7 +178,7 @@ export function trigger(target: Target, type: TriggerOpTypes, key: unknown) {
   triggerEffects(dep)
 }
 
-function triggerEffects(dep: Dep) {
+export function triggerEffects(dep: Dep) {
   const effects = [...dep]
   for (const effect of effects) {
     triggerEffect(effect)

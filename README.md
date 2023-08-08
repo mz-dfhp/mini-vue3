@@ -13,3 +13,5 @@
 - [X] shallowReadonly
 - [X] isReactive isReadonly isShallow isProxy
 - [X] toRaw toReactive
+- [X] ref
+- [X] ref shallowRef
