@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <h1 id="app">
+    </h1>
+    <script src="../packages/reactivity/dist/reactivity.global.js"></script>
+    <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+    <script>
+        // eslint-disable-next-line no-undef
+        const { effect, reactive, toRefs, isRef, unref, ref } = VueReactivity
+
+        // const { effect, reactive } = Vue
+        const user = reactive({
+          name: 'mz',
+          age: 18,
+          sex: 1,
+          address: {
+            city: 'city',
+          },
+        })
+        const page = ref({ pageNum: 1 })
+        const { address } = toRefs(user)
+        console.log(isRef(address))
+        console.log(unref(address))
+        console.log(address.value)
+        console.log(unref(page))
+        console.log(page.value)
+        effect(() => {
+          document.querySelector(
+            '#app',
+          ).innerHTML = `${address.value.city}`
+        })
+        setTimeout(() => {
+          user.address.city = 'toRefs - city'
+        //   address.value.city = 'toRefs - city'
+        }, 2000)
+    </script>
+</body>
+
+</html>

@@ -12,3 +12,7 @@ export function hasChanged(value: any, oldValue: any): boolean {
 }
 
 export const extend = Object.assign
+
+export const isArray = Array.isArray
+
+export type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N
