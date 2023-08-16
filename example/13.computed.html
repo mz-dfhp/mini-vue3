@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <h1 id="app">
+    </h1>
+    <script src="../packages/reactivity/dist/reactivity.global.js"></script>
+    <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+    <script>
+        // eslint-disable-next-line no-undef
+        const { effect, reactive, computed } = VueReactivity
+
+        // const { effect, reactive } = Vue
+        const user = reactive({
+          name: 'mz',
+          age: 18,
+          sex: 1,
+          address: {
+            city: 'city',
+          },
+        })
+        const total = computed({
+          get() {
+            console.log('我执行了')
+            return user.age + user.sex
+          },
+          set(value) {
+            console.log(value)
+          },
+})
+        console.log(total)
+        effect(() => {
+          document.querySelector(
+            '#app',
+          ).innerHTML = `${user.name} ${user.age} ${user.sex} ${user.address.city} ${total.value} ${total.value} ${total.value} ${total.value}`
+        })
+        setTimeout(() => {
+          user.age = 21
+        }, 2000)
+        setTimeout(() => {
+          total.value = 9999
+        }, 4000)
+    </script>
+</body>
+
+</html>

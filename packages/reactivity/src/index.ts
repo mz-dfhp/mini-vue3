@@ -4,3 +4,5 @@ export {
   isReactive, isReadonly, isShallow, isProxy,
 } from './reactive'
 export { ref, shallowRef, toRefs, isRef, unref } from './ref'
+
+export { computed } from './computed'

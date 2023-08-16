@@ -15,3 +15,4 @@
 - [X] toRaw toReactive
 - [X] ref shallowRef toRefs
 - [X] isRef unref
+- [X] computed

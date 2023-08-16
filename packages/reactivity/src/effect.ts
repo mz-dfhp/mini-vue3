@@ -2,6 +2,7 @@ import { extend } from '@vue/shared'
 import { type Dep, createDep } from './dep'
 import type { TrackOpTypes, TriggerOpTypes } from './operations'
 import { type Target } from './reactive'
+import type { ComputedRefImpl } from './computed'
 
 export type EffectScheduler = (...args: any[]) => any
 type KeyToDepMap = Map<any, Dep>
@@ -19,6 +20,7 @@ export let activeEffect: ReactiveEffect | undefined
 export class ReactiveEffect<T = any> {
   active = true // 默认激活状态
   parent: ReactiveEffect | undefined = undefined
+  computed?: ComputedRefImpl<T>
   deps: Dep[] = []
   private deferStop?: boolean // 防止执行过程中停止（stop）当前的响应式效果
   onStop?: () => void
@@ -181,7 +183,14 @@ export function trigger(target: Target, type: TriggerOpTypes, key: unknown) {
 export function triggerEffects(dep: Dep) {
   const effects = [...dep]
   for (const effect of effects) {
-    triggerEffect(effect)
+    if (effect.computed) {
+      triggerEffect(effect)
+    }
+  }
+  for (const effect of effects) {
+    if (!effect.computed) {
+      triggerEffect(effect)
+    }
   }
 }
 

@@ -15,4 +15,8 @@ export const extend = Object.assign
 
 export const isArray = Array.isArray
 
+export function isFunction(val: unknown): val is () => void {
+  return typeof val === 'function'
+}
+
 export type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N
